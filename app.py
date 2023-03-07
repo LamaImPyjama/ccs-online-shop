@@ -23,17 +23,17 @@ db.value
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://" + dbusername.value + ":" + dbpassword.value + "@" + dburl.value + ":5432/" + db.value
-# 
-# 
-# db = SQLAlchemy(app)
-# class Item(db.Model):
-#     __tablename__ = 'items'
-#     id = db.Column(db.Integer, primary_key=True)
-#     item_id = db.Column(db.Integer)
-#     name = db.Column(db.String)
-#     description = db.Column(db.String)
-# with app.app_context():
-#     db.create_all()
+
+
+db = SQLAlchemy(app)
+class Item(db.Model):
+    __tablename__ = 'items'
+    id = db.Column(db.Integer, primary_key=True)
+    item_id = db.Column(db.Integer)
+    name = db.Column(db.String)
+    description = db.Column(db.String)
+with app.app_context():
+    db.create_all()
 
 
 def query_logistic_system(item_id):
@@ -55,18 +55,18 @@ def index():
 
 @app.route('/api/items')
 def get_items():
-#    result = Item.query.all()
+    result = Item.query.all()
     items = []
-#    for item in result:
-#        o = {}
-#        o['item_id'] = item.item_id
-#        o['name'] = item.name
-#        o['description'] = item.description
-#        o['thumbnail'] = blob_storage + str(item.item_id) + ".jpg"
-#        o['stock'] = query_logistic_system(item.item_id)
-#
-#        items.append(o)
-#
+    for item in result:
+        o = {}
+        o['item_id'] = item.item_id
+        o['name'] = item.name
+        o['description'] = item.description
+        o['thumbnail'] = blob_storage + str(item.item_id) + ".jpg"
+        o['stock'] = query_logistic_system(item.item_id)
+
+        items.append(o)
+
     return make_response(jsonify(items), 200)
 
 
