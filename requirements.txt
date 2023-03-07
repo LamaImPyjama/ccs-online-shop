@@ -8,4 +8,3 @@ Werkzeug==2.2.3
 azure-keyvault-secrets
 azure-identity
 flask-sqlalchemy
-psycopg2
