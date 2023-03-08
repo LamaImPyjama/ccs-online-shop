@@ -9,3 +9,4 @@ azure-keyvault-secrets
 azure-identity
 flask-sqlalchemy
 psycopg2-binary
+azure-storage-queue

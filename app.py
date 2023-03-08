@@ -4,12 +4,15 @@ from os import getenv
 from flask_sqlalchemy import SQLAlchemy
 from azure.identity import DefaultAzureCredential
 from azure.keyvault.secrets import SecretClient
+from azure.storage.queue import QueueClient
 import requests
+
 
 credential = DefaultAzureCredential()
 secret_client = SecretClient(vault_url=getenv('KEYVAULTURL'), credential=credential)
 blob_storage = getenv('BLOBSTORAGE')
 logistic_system = getenv('LOGISTICSYSTEM')
+
 
 dbusername = secret_client.get_secret("dbusername")
 dbusername.value
@@ -19,6 +22,14 @@ dburl = secret_client.get_secret("dburl")
 dburl.value
 db = secret_client.get_secret("db")
 db.value
+
+# SMS Azure Storage Queue Client
+sms_queuename = getenv('SMSQUEUENAME')
+sms_queuekey = secret_client.get_secret("queuekey")
+sms_storageaccount = getenv('SMSSTORAGEACCOUNT')
+sms_ordermessage = getenv('SMSORDERMESSAGE')
+sms_queue_connection = "DefaultEndpointsProtocol=https;AccountName= + sms_storageaccount" + ";AccountKey=" + sms_queuekey + ";EndpointSuffix=core.windows.net"
+sms_queue_client = QueueClient.from_connection_string(sms_queue_connection, sms_queuename)
 
 
 app = Flask(__name__)
@@ -74,4 +85,11 @@ def get_items():
 def order_item(item_id):
     item_id = int(item_id)
     update_logistic_system(item_id)
+    sms_queue_client.send_message(sms_ordermessage)
+    return jsonify("success")
+
+
+@app.route('/testsms')
+def testsms():
+    sms_queue_client.send_message(sms_ordermessage)
     return jsonify("success")
