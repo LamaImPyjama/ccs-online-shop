@@ -104,5 +104,6 @@ def order_item(item_id):
 
 @app.route('/testsms')
 def testsms():
-    sms_queue_client.send_message(sms_ordermessage)
-    return jsonify("success")
+    queue_response = sms_queue_client.send_message(sms_ordermessage)
+    print(queue_response)
+    return render_template('index.html')
