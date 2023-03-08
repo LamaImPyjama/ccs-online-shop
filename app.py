@@ -8,12 +8,27 @@ from azure.storage.queue import QueueClient
 import requests
 
 
+# Create Flask App
+app = Flask(__name__)
+
+
+# Get Azure Credentials
 credential = DefaultAzureCredential()
+
+
+# Create Azure Key Vault Client
 secret_client = SecretClient(vault_url=getenv('KEYVAULTURL'), credential=credential)
+
+
+# Set Azure Blob Storage URL
 blob_storage = getenv('BLOBSTORAGE')
+
+
+# Set AWS Rest API Logistic System URL
 logistic_system = getenv('LOGISTICSYSTEM')
 
 
+# Get DB Connection Data from Azure Key Vault
 dbusername = secret_client.get_secret("dbusername")
 dbusername.value
 dbpassword = secret_client.get_secret("dbpassword")
@@ -22,6 +37,8 @@ dburl = secret_client.get_secret("dburl")
 dburl.value
 db = secret_client.get_secret("db")
 db.value
+app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://" + dbusername.value + ":" + dbpassword.value + "@" + dburl.value + ":5432/" + db.value
+
 
 # SMS Azure Storage Queue Client
 sms_queuename = getenv('SMSQUEUENAME')
@@ -32,10 +49,7 @@ sms_queue_connection = "DefaultEndpointsProtocol=https;AccountName= + sms_storag
 sms_queue_client = QueueClient.from_connection_string(sms_queue_connection, sms_queuename)
 
 
-app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = "postgresql://" + dbusername.value + ":" + dbpassword.value + "@" + dburl.value + ":5432/" + db.value
-
-
+# Connect to database and create the table
 db = SQLAlchemy(app)
 class Item(db.Model):
     __tablename__ = 'items'
@@ -75,7 +89,6 @@ def get_items():
         o['description'] = item.description
         o['thumbnail'] = blob_storage + str(item.item_id) + ".jpg"
         o['stock'] = query_logistic_system(item.item_id)
-
         items.append(o)
 
     return make_response(jsonify(items), 200)
