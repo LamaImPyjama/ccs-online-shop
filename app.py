@@ -45,7 +45,7 @@ sms_queuename = getenv('SMSQUEUENAME')
 sms_queuekey = secret_client.get_secret("queuekey")
 sms_storageaccount = getenv('SMSSTORAGEACCOUNT')
 sms_ordermessage = getenv('SMSORDERMESSAGE')
-sms_queue_connection = "DefaultEndpointsProtocol=https;AccountName= + sms_storageaccount" + ";AccountKey=" + sms_queuekey + ";EndpointSuffix=core.windows.net"
+sms_queue_connection = "DefaultEndpointsProtocol=https;AccountName= + sms_storageaccount" + ";AccountKey=" + sms_queuekey.value + ";EndpointSuffix=core.windows.net"
 sms_queue_client = QueueClient.from_connection_string(sms_queue_connection, sms_queuename)
 
 
